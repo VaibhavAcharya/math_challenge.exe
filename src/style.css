@@ -1,0 +1,608 @@
+:root {
+  --background: #0a0e14;
+  --surface: #131721;
+  --primary: #00ff9d;
+  --secondary: #00b8d4;
+  --accent: #ff1744;
+  --text: #e6e6e6;
+  --muted-text: #607d8b;
+  --terminal-green: #00ff9d;
+  --terminal-header: #1a1d24;
+  --code-background: #0d1117;
+  --shadow: rgba(0, 0, 0, 0.5);
+}
+
+/* Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Fira Code', monospace;
+  background-color: var(--background);
+  color: var(--text);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* CRT and Scanline Effects */
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.03) 50%,
+    rgba(0, 0, 0, 0.03) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.crt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(10, 14, 20, 0) 0%,
+    rgba(10, 14, 20, 0.2) 80%,
+    rgba(10, 14, 20, 0.4) 100%
+  );
+  z-index: 99;
+  pointer-events: none;
+}
+
+/* Matrix Canvas Background */
+#matrixCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+/* Terminal Container */
+.terminal-container {
+  width: 90%;
+  max-width: 900px;
+  height: 90vh;
+  max-height: 800px;
+  position: relative;
+  box-shadow: 0 10px 30px var(--shadow);
+  animation: startup 0.5s ease-in-out;
+}
+
+@keyframes startup {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.01);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Terminal Window */
+.terminal-window {
+  width: 100%;
+  height: 100%;
+  background-color: var(--surface);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border: 1px solid rgba(0, 255, 157, 0.2);
+  box-shadow: 0 0 20px rgba(0, 255, 157, 0.1);
+}
+
+/* Terminal Header */
+.terminal-header {
+  height: 36px;
+  background-color: var(--terminal-header);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.terminal-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted-text);
+}
+
+.terminal-controls {
+  display: flex;
+  align-items: center;
+}
+
+.control {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-left: 8px;
+}
+
+.minimize {
+  background-color: #ffbd2e;
+}
+
+.maximize {
+  background-color: #28c940;
+}
+
+.close {
+  background-color: #ff5f56;
+}
+
+/* Terminal Content */
+.terminal-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  position: relative;
+}
+
+/* ASCII Title */
+.ascii-title {
+  color: var(--primary);
+  text-align: center;
+  margin-bottom: 15px;
+  animation: pulse 4s infinite alternate;
+}
+
+@keyframes pulse {
+  0% {
+    text-shadow: 0 0 5px rgba(0, 255, 157, 0.5);
+  }
+  100% {
+    text-shadow: 0 0 20px rgba(0, 255, 157, 0.8);
+  }
+}
+
+/* Command Line */
+.command-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 5px;
+}
+
+.prompt {
+  color: var(--primary);
+  margin-right: 10px;
+  font-weight: 500;
+}
+
+.command {
+  color: var(--text);
+}
+
+.blink-cursor::after {
+  content: '|';
+  animation: blink 1s step-end infinite;
+  color: var(--primary);
+  font-weight: bold;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* System Output */
+.system-output {
+  color: var(--muted-text);
+  margin-bottom: 15px;
+  line-height: 1.6;
+}
+
+.system-output p {
+  margin-bottom: 5px;
+}
+
+.highlight {
+  color: var(--primary);
+  font-weight: bold;
+}
+
+/* Terminal Buttons */
+.terminal-btn {
+  background-color: var(--terminal-header);
+  color: var(--text);
+  border: 1px solid var(--primary);
+  padding: 10px 15px;
+  font-family: 'Fira Code', monospace;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  outline: none;
+  font-weight: 500;
+  display: inline-block;
+  text-align: center;
+}
+
+.terminal-btn:hover {
+  background-color: rgba(0, 255, 157, 0.1);
+  box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+}
+
+.terminal-btn:active {
+  transform: translateY(1px);
+}
+
+.difficulty-btn {
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+.difficulty-btn.active {
+  background-color: rgba(0, 255, 157, 0.2);
+  box-shadow: 0 0 15px rgba(0, 255, 157, 0.4);
+}
+
+.execute-btn {
+  background-color: rgba(0, 255, 157, 0.1);
+  color: var(--primary);
+  font-weight: bold;
+  padding: 10px 25px;
+  margin-top: 10px;
+  align-self: flex-start;
+}
+
+.warning-btn {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.warning-btn:hover {
+  background-color: rgba(255, 23, 68, 0.1);
+  box-shadow: 0 0 10px rgba(255, 23, 68, 0.3);
+}
+
+.info-btn {
+  border-color: var(--secondary);
+  color: var(--secondary);
+}
+
+.info-btn:hover {
+  background-color: rgba(0, 184, 212, 0.1);
+  box-shadow: 0 0 10px rgba(0, 184, 212, 0.3);
+}
+
+/* Difficulty Selection */
+.difficulty-selection {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+/* Status Bar */
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--terminal-header);
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+}
+
+.status-label {
+  color: var(--muted-text);
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+.status-value {
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.lives-value {
+  color: var(--accent);
+}
+
+.score-value {
+  color: var(--primary);
+}
+
+.timer-value {
+  color: var(--secondary);
+}
+
+.timer.warning .timer-value {
+  animation: timerWarning 0.5s infinite alternate;
+}
+
+@keyframes timerWarning {
+  from { color: var(--secondary); }
+  to { color: var(--accent); }
+}
+
+/* Code Block */
+.code-block {
+  background-color: var(--code-background);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.code-header {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 8px 15px;
+  font-size: 14px;
+  color: var(--muted-text);
+}
+
+.code-content {
+  padding: 15px;
+}
+
+.code-content pre {
+  margin: 0;
+  font-family: 'Fira Code', monospace;
+  line-height: 1.5;
+  counter-reset: line;
+  white-space: pre-wrap;
+}
+
+.code-line-number {
+  color: #4f5666;
+  margin-right: 15px;
+  user-select: none;
+}
+
+.code-comment {
+  color: #6a737d;
+}
+
+.code-keyword {
+  color: #ff79c6;
+}
+
+.code-variable {
+  color: #bd93f9;
+}
+
+.code-string {
+  color: #f1fa8c;
+}
+
+.code-method {
+  color: #50fa7b;
+}
+
+/* Answer Input */
+.answer-line {
+  margin-top: 20px;
+  position: relative;
+}
+
+.keyboard-hint {
+  color: var(--muted-text);
+  font-size: 12px;
+  margin: 5px 0 0 20px;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.command-input {
+  background-color: transparent;
+  border: none;
+  color: var(--primary);
+  font-family: 'Fira Code', monospace;
+  font-size: 18px;
+  font-weight: 600;
+  outline: none;
+  padding: 0 5px;
+  flex: 1;
+  height: 28px;
+  caret-color: var(--primary);
+  text-shadow: 0 0 5px rgba(0, 255, 157, 0.5);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.command-input::placeholder {
+  color: rgba(0, 255, 157, 0.3);
+}
+
+.command-input:focus {
+  box-shadow: 0 0 0 2px rgba(0, 255, 157, 0.2);
+  background-color: rgba(0, 255, 157, 0.05);
+  border-radius: 4px;
+}
+
+.command-input:focus + .blink-cursor {
+  display: inline-block;
+}
+
+.command-input.invalid {
+  animation: shake 0.3s;
+  color: var(--accent);
+  text-shadow: 0 0 5px rgba(255, 23, 68, 0.5);
+  box-shadow: 0 0 0 2px rgba(255, 23, 68, 0.2);
+  background-color: rgba(255, 23, 68, 0.05);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+/* Game Over */
+.error {
+  color: var(--accent);
+}
+
+.glitch-text {
+  animation: glitch 3s infinite;
+  position: relative;
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); }
+  2% { transform: translate(-3px, 2px); }
+  4% { transform: translate(3px, -2px); }
+  6% { transform: translate(0); }
+  98% { transform: translate(0); }
+  99% { transform: translate(2px, 3px); }
+  100% { transform: translate(-2px, -3px); }
+}
+
+/* Error flash for the body */
+.error-flash {
+  animation: errorFlash 0.5s;
+}
+
+@keyframes errorFlash {
+  0% { background-color: rgba(10, 14, 20, 1); }
+  25% { background-color: rgba(255, 23, 68, 0.2); }
+  50% { background-color: rgba(10, 14, 20, 1); }
+  75% { background-color: rgba(255, 23, 68, 0.15); }
+  100% { background-color: rgba(10, 14, 20, 1); }
+}
+
+.system-log {
+  background-color: rgba(255, 255, 255, 0.03);
+  padding: 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  border-left: 2px solid var(--primary);
+}
+
+.log-entry {
+  margin-bottom: 5px;
+  color: var(--muted-text);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+/* Correct/Incorrect Animations */
+.question.correct {
+  animation: correctAnswer 1.5s;
+  position: relative;
+  z-index: 10;
+}
+
+.question.incorrect {
+  animation: incorrectAnswer 1.5s;
+  position: relative;
+  z-index: 10;
+}
+
+@keyframes correctAnswer {
+  0% { color: var(--primary); transform: scale(1); }
+  20% { color: #28c940; text-shadow: 0 0 20px rgba(40, 201, 64, 0.8); transform: scale(1.1); }
+  40% { color: #28c940; text-shadow: 0 0 15px rgba(40, 201, 64, 0.6); transform: scale(1.05); }
+  100% { color: var(--primary); transform: scale(1); }
+}
+
+@keyframes incorrectAnswer {
+  0% { color: var(--primary); transform: scale(1); }
+  10% { color: var(--accent); text-shadow: 0 0 20px rgba(255, 23, 68, 0.8); transform: scale(1.05) rotate(-1deg); }
+  20% { color: var(--accent); text-shadow: 0 0 15px rgba(255, 23, 68, 0.6); transform: scale(1.05) rotate(1deg); }
+  30% { color: var(--accent); text-shadow: 0 0 10px rgba(255, 23, 68, 0.5); transform: scale(1.05) rotate(-1deg); }
+  40% { color: var(--accent); text-shadow: 0 0 15px rgba(255, 23, 68, 0.6); transform: scale(1.05) rotate(1deg); }
+  100% { color: var(--primary); transform: scale(1) rotate(0); }
+}
+
+/* Add styling for code block feedback */
+.code-block {
+  transition: box-shadow 0.3s ease;
+}
+
+/* Keyframe Animations for Text Appearing */
+.typing {
+  display: inline-block;
+  animation: typing 0.5s steps(1, end);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .terminal-container {
+    width: 95%;
+    height: 95vh;
+  }
+  
+  .status-bar {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .difficulty-selection {
+    flex-direction: column;
+  }
+  
+  .difficulty-btn {
+    margin-right: 0;
+    margin-bottom: 10px;
+    width: 100%;
+  }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}

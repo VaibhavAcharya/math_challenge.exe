@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Maths_Challenge.exe</title>
+  </head>
+  <body>
+    <!-- Matrix Canvas Background -->
+    <canvas id="matrixCanvas"></canvas>
+    
+    <!-- Scanlines Overlay -->
+    <div class="scanlines"></div>
+    
+    <!-- CRT Overlay -->
+    <div class="crt-overlay"></div>
+    
+    <!-- Terminal UI Container -->
+    <div class="terminal-container">
+      <!-- Home Screen -->
+      <div class="terminal-window" id="homeScreen">
+        <div class="terminal-header">
+          <div class="terminal-title">MATH_CHALLENGE.EXE</div>
+          <div class="terminal-controls">
+            <span class="control minimize"></span>
+            <span class="control maximize"></span>
+            <span class="control close"></span>
+          </div>
+        </div>
+        
+        <div class="terminal-content">
+          <div class="ascii-title">
+            <pre>
+█▀▄▀█ ▄▀█ ▀█▀ █░█   █▀▀ █░█ ▄▀█ █░░ █░░ █▀▀ █▄░█ █▀▀ █▀▀
+█░▀░█ █▀█ ░█░ █▀█   █▄▄ █▀█ █▀█ █▄▄ █▄▄ ██▄ █░▀█ █▄█ ██▄
+            </pre>
+          </div>
+          
+          <div class="command-line">
+            <span class="prompt">root@math-challenge:~$</span>
+            <span class="command">./initialize_system.sh</span>
+          </div>
+          
+          <div class="system-output">
+            <p>> System initialized</p>
+            <p>> Loading resources...</p>
+            <p>> Checking high score...</p>
+            <p class="highscore" id="highscoreDisplay">> HIGH_SCORE = <span class="highlight">0</span></p>
+          </div>
+          
+          <div class="command-line">
+            <span class="prompt">root@math-challenge:~$</span>
+            <span class="command">./select_difficulty.sh</span>
+          </div>
+          
+          <div class="system-output">
+            <p>> SELECT DIFFICULTY LEVEL:</p>
+          </div>
+          
+          <div class="difficulty-selection">
+            <button class="terminal-btn difficulty-btn" data-difficulty="easy">[1] EASY</button>
+            <button class="terminal-btn difficulty-btn" data-difficulty="medium">[2] MEDIUM</button>
+            <button class="terminal-btn difficulty-btn" data-difficulty="hard">[3] HARD</button>
+          </div>
+          <div class="keyboard-hint">Press [1], [2], or [3] to select difficulty</div>
+          
+          <div class="command-line">
+            <span class="prompt">root@math-challenge:~$</span>
+            <span class="command blink-cursor">execute</span>
+          </div>
+          
+          <button class="terminal-btn execute-btn" id="startButton">$ EXECUTE</button>
+        </div>
+      </div>
+      
+      <!-- Game Screen -->
+      <div class="terminal-window hidden" id="gameScreen">
+        <div class="terminal-header">
+          <div class="terminal-title">MATH_CHALLENGE.EXE [RUNNING]</div>
+          <div class="terminal-controls">
+            <span class="control minimize"></span>
+            <span class="control maximize"></span>
+            <span class="control close"></span>
+          </div>
+        </div>
+        
+        <div class="terminal-content">
+          <div class="system-output">
+            <p>> Initializing challenge module...</p>
+            <p>> System ready</p>
+          </div>
+          
+          <div class="status-bar">
+            <div class="status-item" id="livesDisplay">
+              <span class="status-label">LIVES:</span>
+              <span class="status-value lives-value">3</span>
+            </div>
+            <div class="status-item" id="scoreDisplay">
+              <span class="status-label">SCORE:</span>
+              <span class="status-value score-value">0</span>
+            </div>
+            <div class="status-item timer" id="timerDisplay">
+              <span class="status-label">TIME:</span>
+              <span class="status-value timer-value">30s</span>
+            </div>
+          </div>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">math_problem.js</span>
+            </div>
+            <div class="code-content">
+              <pre><code><span class="code-line-number">01</span><span class="code-comment">// Solve the following equation:</span>
+<span class="code-line-number">02</span><span class="code-keyword">const</span> <span class="code-variable">problem</span> = <span class="code-string">"<span id="questionDisplay">6 × 7 = ?</span>"</span>;
+<span class="code-line-number">03</span><span class="code-keyword">let</span> <span class="code-variable">answer</span> = <span class="code-method">parseInt(</span><span class="code-variable">prompt</span><span class="code-method">()</span><span class="code-method">)</span>;</span></code></pre>
+            </div>
+          </div>
+          
+          <div class="command-line answer-line">
+            <span class="prompt">answer@math-challenge:~$</span>
+            <input type="number" class="command-input" id="answerInput" placeholder="Type your answer here..." autofocus>
+            <span class="blink-cursor"></span>
+          </div>
+          <div class="keyboard-hint">Press [Enter] to submit answer</div>
+          
+          <button class="terminal-btn execute-btn" id="submitButton">$ EXECUTE</button>
+        </div>
+      </div>
+      
+      <!-- Game Over Screen -->
+      <div class="terminal-window hidden" id="gameOverScreen">
+        <div class="terminal-header">
+          <div class="terminal-title">MATH_CHALLENGE.EXE [TERMINATED]</div>
+          <div class="terminal-controls">
+            <span class="control minimize"></span>
+            <span class="control maximize"></span>
+            <span class="control close"></span>
+          </div>
+        </div>
+        
+        <div class="terminal-content">
+          <div class="system-output error">
+            <pre class="glitch-text game-over-title">
+█▀ █▄█ █▀ ▀█▀ █▀▀ █▀▄▀█   █▀▀ ▄▀█ █ █░░ █░█ █▀█ █▀▀
+▄█ ░█░ ▄█ ░█░ ██▄ █░▀░█   █▀░ █▀█ █ █▄▄ █▄█ █▀▄ ██▄
+            </pre>
+          </div>
+          
+          <div class="system-log">
+            <p class="log-entry">> Session terminated</p>
+            <p class="log-entry">> Generating performance report...</p>
+            <p class="log-entry" id="finalScoreDisplay">> DATA PROCESSED: <span class="highlight">0</span> units</p>
+            <p class="log-entry" id="finalHighScoreDisplay">> ALL-TIME RECORD: <span class="highlight">0</span> units</p>
+          </div>
+          
+          <div class="command-line">
+            <span class="prompt">root@math-challenge:~$</span>
+            <span class="command">./system_options.sh</span>
+          </div>
+          
+          <div class="system-output">
+            <p>> SELECT OPERATION:</p>
+          </div>
+          
+          <div class="action-buttons">
+            <button class="terminal-btn warning-btn" id="restartButton">$ RESTART_SYSTEM</button>
+            <button class="terminal-btn info-btn" id="homeButton">$ RETURN_TO_MAIN</button>
+          </div>
+          <div class="keyboard-hint">Press [R] to restart or [H] to return home</div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
